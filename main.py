@@ -281,9 +281,6 @@ def main():
                 backup(dev)
         elif args.command == "backup" and args.device and args.threading:
             threader(backup, args.device)
-            ## for dev in args.device:
-            # print(dev)
-            # exit(1)
             ## threading(backup, dev)
         # backup from file list
         elif args.command == "backup" and args.file and args.threading is False:
