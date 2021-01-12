@@ -176,7 +176,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='cisco ios toolkit',
         usage='iostoolkit.py [command] [-options]',
-        epilog='Example:\n"python3 iostoolkit.py backup -f ./hostlist.txt -t"',
+        epilog='Example:\n"python3 iostoolkit.py backup -d 192.168.1.201 192.168.1.202 ./hostlist.txt -t"',
         allow_abbrev=True,
         add_help=True)
 
@@ -190,8 +190,10 @@ def main():
     subparsers = parser.add_subparsers(help="", title="Commands", dest="command", metavar="")
 
     # upload
-    upload_parser = subparsers.add_parser("upload", help="upload a file",
-                                          usage="iostoolkit.py upload [file] [remote path] [device list] [-options]")
+    upload_parser = subparsers.add_parser("upload", help="upload a file from remote ios or linux device",
+                                          usage="iostoolkit.py upload [file] [remote path] [device list] [-options]",
+                                          epilog='Example:\n'
+                                                 '"python3 iostoolkit.py upload ./hostlist.txt ./" -d 192.168.1.12')
     upload_parser.add_argument("scpfile", help="upload local file Default=ssh user home dir")
     upload_parser.add_argument("path", action="store", help="remote path | Default=overwrite existing file")
     upload_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
@@ -201,10 +203,12 @@ def main():
     device.add_argument("-f", "--file", help="file with the list of hostnames", type=str)
 
     # download
-    download_parser = subparsers.add_parser("download", help="download a file",
-                                            usage="iostoolkit.py download [file] [local path] [device list] [-options]")
+    download_parser = subparsers.add_parser("download", help="download a file from remote ios or linux device",
+                                            usage="iostoolkit.py download [file] [local path] [device list] [-options]",
+                                            epilog='Example:\n"python3 '
+                                                   'iostoolkit.py download ./hostlist.txt ./ -d 192.168.1.12"')
     download_parser.add_argument("scpfile", action="store", help="download remote file")
-    download_parser.add_argument("path", action="store", help="local path | Default=script dir")
+    download_parser.add_argument("path", action="store", help="local path | Default=script dir and same filename")
     download_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     device = download_parser.add_mutually_exclusive_group(required=True)
     device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
@@ -212,7 +216,9 @@ def main():
 
     # backup
     backup_parser = subparsers.add_parser("backup", help="backup running-config in local dir",
-                                          usage="iostoolkit.py backup [device list] [-options]")
+                                          usage="iostoolkit.py backup [device list] [-options]",
+                                          epilog='Example:\n"python3 '
+                                                 'iostoolkit.py backup -f hostlist.txt -t"')
     backup_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     backup_parser.add_argument('-t', '--threading', help='enable threading', action='store_true', default=False)
     device = backup_parser.add_mutually_exclusive_group(required=True)
@@ -221,7 +227,9 @@ def main():
 
     # api
     api_parser = subparsers.add_parser("api", help="backup running-config in local dir",
-                                       usage="iostoolkit.py backup [device list] [-options]")
+                                       usage="iostoolkit.py backup [device list] [-options]",
+                                       epilog='Example:\n"python3 '
+                                              'iostoolkit.py download ./hostlist.txt ./ -d 192.168.1.12"')
     api_parser.add_argument("username", action="store")
     api_parser.add_argument("password", )
     api_parser_g = api_parser.add_mutually_exclusive_group()
