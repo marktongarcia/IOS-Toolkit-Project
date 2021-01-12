@@ -225,6 +225,21 @@ def main():
     device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
     device.add_argument("-f", "--file", help="file with the list of hostnames", type=str)
 
+
+    # config
+    config_parser = subparsers.add_parser("config", help="config using using a file with list of commands",
+                                          usage="iostoolkit.py config [device list] [-options]",
+                                          epilog='Example:\n"python3 '
+                                                 'iostoolkit.py backup -f hostlist.txt -t"')
+    config_parser.add_argument("commands", action="store", help="path and filename of commands file\n"
+                                                                "defaul: ./commands.txt")
+    config_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
+    config_parser.add_argument('-t', '--threading', help='enable threading', action='store_true', default=False)
+    device = config_parser.add_mutually_exclusive_group(required=True)
+    device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
+    device.add_argument("-f", "--file", help="file with the list of hostnames", type=str)
+
+
     # api
     api_parser = subparsers.add_parser("api", help="backup running-config in local dir",
                                        usage="iostoolkit.py backup [device list] [-options]",
