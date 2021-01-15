@@ -292,8 +292,8 @@ def main():
                                           usage="iostoolkit.py config [device list] [-options]",
                                           epilog='Example:\n"python3 '
                                                  'iostoolkit.py backup -f hostlist.txt -t"')
-    config_parser.add_argument("config", action="store", help="path and filename of config file\n"
-                                                                "defaul: ./config.txt")
+    config_parser.add_argument("config", action="store", help="config file containing list of commands\n"
+                                                                "defaut: ./commands.txt")
     config_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     config_parser.add_argument('-t', '--threading', help='enable threading', action='store_true', default=False)
     config_parser.add_argument('-v', '--verbose', help='enable verbose', action='store_true', default=False)
