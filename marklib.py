@@ -48,13 +48,16 @@ def send_command(shell, command, timeout=1):
     time.sleep(timeout)
 
 
-def send_from_file(shell, file_name, time=5):
-    print(f'Opening file {file_name}')
+def send_from_file(shell, file_name, verbose=False, timeout=5):
+    if verbose:
+        print(f'Opening file {file_name}')
     with open(file_name) as f:
         commands = f.read().splitlines()
         # remove accidental blank in the list.
         commands = list(filter(None, commands))
-        print(f'sending commands to {shell}: {commands}')
+        print('Configuring device...')
+        if verbose:
+            print(f'sending commands to {shell}: {commands}')
         for cmd in commands:
             send_command(shell, cmd.lower())
 

@@ -66,7 +66,7 @@ def listping(obj, hostname, file, switch, verbose):
                     red + site + '-SW is unreachable' + res)))
 
 
-def backup(router):
+def backup(router, verbose=False):
     '''
     takes in an ip address or fqdn of a device "router".
     taken argument could be a list and the loop is done in argparse
@@ -122,34 +122,40 @@ def backup(router):
     finally:
         pass
 
-def config(router, commands):
+def config(router, commands, verbose=False):
+    # print(verbose)
+    # exit(1)
     client = x.connect(router)
     shell = x.get_shell(client)
 
-    x.send_from_file(shell, commands)
+    x.send_from_file(shell, commands, verbose)
 
-    # capture and decode output
-    output = x.show(shell)
+    # closing the ssh session if active
+    x.close(client)
 
-    # processing the output
-    output_list = output.splitlines()
-    output_list = output_list[15:-1]
-    print(output_list)
-    output = '\n'.join(output_list)
-    print(output)
+    if verbose:
+        # capture and decode output
+        output = x.show(shell)
 
-    ## api using cookie or token using Authentication
-    #def apix():
-    #    authdata = {'username': 'admin', 'password': 'admin'}
-    #    url = "http://192.168.1.13:8000/login/?next=/"
-    #    r = requests.post('http://192.168.1.13:8000/login/?next=/', data=json.dumps(authdata), verify=False, proxies=None)
-    #    print(r)
-    #    token = json.loads(r.text)['session']
-    #    print(token)
-    #
-    #
-    ## api using pre-defined token access
-    #def apiy():
+        # processing the output
+        output_list = output.splitlines()
+        output_list = output_list[15:-1]
+        print(output_list)
+        output = '\n'.join(output_list)
+        print(output)
+
+# api using cookie or token using Authentication
+def apix():
+    authdata = {'username': 'admin', 'password': 'admin'}
+    url = "http://192.168.1.13:8000/login/?next=/"
+    r = requests.post('http://192.168.1.13:8000/login/?next=/', data=json.dumps(authdata), verify=False, proxies=None)
+    print(r)
+    token = json.loads(r.text)['session']
+    print(token)
+
+
+# api using pre-defined token access
+def apiy():
     # test info
     testip = "192.168.1.201"
     # api query
@@ -168,7 +174,7 @@ def config(router, commands):
     return j['results'][0]['id']
 
 
-def threader(function, routers):
+def threader(functionx, routers, verbose=False):
     '''
     By default, the execution of a python script is sequentially with a single process and a single thread inside it.
     Multithreading will execute the compatible tasks/functions like backup() concurrently.
@@ -188,8 +194,12 @@ def threader(function, routers):
         threads = list()  # list (list() / []) can also store any objects including abstract objects like threads.
         for router in routers:
             # creating a thread for each router in the list, that executes the backup function
-            th = threading.Thread(target=backup, args=(router,))  # constructor that creates a thread.  'router'
-            # is a tuple and when you  want a tuple with only one element, you should add a comma after that single element.
+            #th = threading.Thread(target=function, args=(router,), verbose=False)  # constructor that creates a thread.
+            # args 'router' is a tuple and when you  want a tuple with only one element,
+            # you should add a comma after that single element.
+            print(functionx)
+            exit(1)
+            th = threading.Thread(target=function, args=[router, verbose])
             threads.append(th)  # appending the thread to the list
         # starting the threads
         for th in threads:  # this will start each threads.
@@ -227,7 +237,7 @@ def main():
     subparsers = parser.add_subparsers(help="", title="Commands", dest="command", metavar="")
 
     # upload
-    upload_parser = subparsers.add_parser("upload", help="upload a file from remote ios or linux device",
+    upload_parser = subparsers.add_parser("upload", help="upload a file to remote ios or linux device",
                                           usage="iostoolkit.py upload [file] [remote path] [device list] [-options]",
                                           epilog='Example:\n'
                                                  '"python3 iostoolkit.py upload ./hostlist.txt ./" -d 192.168.1.12')
@@ -272,13 +282,14 @@ def main():
                                                                 "defaul: ./commands.txt")
     config_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     config_parser.add_argument('-t', '--threading', help='enable threading', action='store_true', default=False)
+    config_parser.add_argument('-v', '--verbose', help='enable verbose', action='store_true', default=False)
     device = config_parser.add_mutually_exclusive_group(required=True)
     device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
     device.add_argument("-f", "--file", help="file with the list of hostnames", type=str)
 
 
     # api
-    api_parser = subparsers.add_parser("api", help="backup running-config in local dir",
+    api_parser = subparsers.add_parser("api", help="rest api",
                                        usage="iostoolkit.py backup [device list] [-options]",
                                        epilog='Example:\n"python3 '
                                               'iostoolkit.py download ./hostlist.txt ./ -d 192.168.1.12"')
@@ -332,7 +343,7 @@ def main():
                 # exit(1)
                 backup(dev)
         elif args.command == "backup" and args.device and args.threading:
-            threader(backup, args.device)
+            threader(args.command, args.device)
             ## threading(backup, dev)
         # backup from file list
         elif args.command == "backup" and args.file and args.threading is False:
@@ -357,7 +368,7 @@ def main():
                     inputfile = inputfile.read().splitlines()
                     # remove accidental blank in the list, these blanks returns all records in database.
                     routers = list(filter(None, inputfile))
-                    threader(backup, routers)
+                    threader(args.command, routers)
             except FileNotFoundError as e:
                 print(f'There is an error FileNotFoundError: {e}')
             finally:
@@ -367,7 +378,9 @@ def main():
             for dev in args.device:
                # print(f'push list of commands in {args.commands} to {dev}')
                # exit(1)
-                config(dev, args.commands)
+                config(dev, args.commands, verbose=args.verbose)
+        elif args.command == "config" and args.device and args.threading:
+            threader(args.command, args.device, verbose=args.verbose)
 #        elif args.command == "config" and args.device and args.threading:
 #            threader(config, args.device)
 #        # config from file list
@@ -426,7 +439,7 @@ def main():
                 for dev in args.device:
                     x.scp_connect(dev, args.scpfile, args.path, args.command)
         # apiy
-        elif args.comman == "api":
+        elif args.command == "api":
             apiy()
         else:
             print("Error:Requires an argument to perform an action")
