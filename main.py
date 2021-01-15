@@ -9,16 +9,24 @@ import argparse
 import sys
 import argcomplete
 from scp import SCPClient
-import click
+from click import confirm
 import requests, json
 import ssl
 
 """
-
+Permission to make digital or hard copies of all or part of this work for
+personal or classroom use is granted without fee provided that copies are
+not made or distributed for profit or commercial advantage and that copies
+bear this notice and the full citation on the first page. To copy otherwise, to
+republish, to post on servers or to redistribute to lists, requires prior specific
+permission and/or a fee.
+IMC’11, November 2–4, 2011, Berlin, Germany.
+Copyright 2011 ACM 978-1-4503-1013-0/11/11 ...$10.00.
 """
 
 __author__ = "Mark Garcia"
-__copyright__ = "Copyright 2020, The IOS/Shell Toolkit Project"
+__copyright__ = "Copyright (c) 2020, Mark Garcia - The IOS/Shell Toolkit Project"
+__license__ = "Private Domain"
 __version__ = 1.01
 __maintainer__ = "Mark Garcia"
 __email__ = "garcia.markanthony@gmail.com"
@@ -122,13 +130,13 @@ def backup(router, verbose=False):
     finally:
         pass
 
-def config(router, commands, verbose=False):
+def config(router, conf=None, verbose=False):
     # print(verbose)
     # exit(1)
     client = x.connect(router)
     shell = x.get_shell(client)
 
-    x.send_from_file(shell, commands, verbose)
+    x.send_from_file(shell, conf, verbose)
 
     # closing the ssh session if active
     x.close(client)
@@ -174,15 +182,18 @@ def apiy():
     return j['results'][0]['id']
 
 
-def threader(functionx, routers, verbose=False):
+def threader(function, routers, conf=None, verbose=False):
     '''
     By default, the execution of a python script is sequentially with a single process and a single thread inside it.
     Multithreading will execute the compatible tasks/functions like backup() concurrently.
     There is a difference between concurrency and parallelism.
     In fact the cpu does not execute the threads in parallel.
 
-    this takes in two arguments: first argument is the compatible function and
-    next is the routers which is a list of ip or fqdn. show docstring
+    this takes in two arguments: first argument is the compatible function which is used to define the target; used
+    without the "()".
+    and next are the arguments (e.g. routers which is a list of ip or fqdn, boolean verbose and conf file).
+    :param config: file with the list of commands
+    :type config: list
     :param function: arg1 name of compatible function to use threading
     :type function: str
     :param routers: arg2 list of ip or fqdn
@@ -194,12 +205,15 @@ def threader(functionx, routers, verbose=False):
         threads = list()  # list (list() / []) can also store any objects including abstract objects like threads.
         for router in routers:
             # creating a thread for each router in the list, that executes the backup function
-            #th = threading.Thread(target=function, args=(router,), verbose=False)  # constructor that creates a thread.
+            #th = threading.Thread(target=function, args=(router,))  # constructor that creates a thread.
             # args 'router' is a tuple and when you  want a tuple with only one element,
-            # you should add a comma after that single element.
-            print(functionx)
-            exit(1)
-            th = threading.Thread(target=function, args=[router, verbose])
+            # you should add a comma after that single element.  since we have several args, we can use a list instead.
+            # print(function)
+            # exit(1)
+            if function == "backup":
+                th = threading.Thread(target=backup, args=[router, verbose])
+            elif function == "config":
+                th = threading.Thread(target=config, args=[router, conf, verbose])
             threads.append(th)  # appending the thread to the list
         # starting the threads
         for th in threads:  # this will start each threads.
@@ -274,12 +288,12 @@ def main():
 
 
     # config
-    config_parser = subparsers.add_parser("config", help="config using using a file with list of commands",
+    config_parser = subparsers.add_parser("config", help="config using using a file with list of config",
                                           usage="iostoolkit.py config [device list] [-options]",
                                           epilog='Example:\n"python3 '
                                                  'iostoolkit.py backup -f hostlist.txt -t"')
-    config_parser.add_argument("commands", action="store", help="path and filename of commands file\n"
-                                                                "defaul: ./commands.txt")
+    config_parser.add_argument("config", action="store", help="path and filename of config file\n"
+                                                                "defaul: ./config.txt")
     config_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     config_parser.add_argument('-t', '--threading', help='enable threading', action='store_true', default=False)
     config_parser.add_argument('-v', '--verbose', help='enable verbose', action='store_true', default=False)
@@ -376,11 +390,11 @@ def main():
         # config device
         elif args.command == "config" and args.device and args.threading is False:
             for dev in args.device:
-               # print(f'push list of commands in {args.commands} to {dev}')
+               # print(f'push list of config in {args.config} to {dev}')
                # exit(1)
-                config(dev, args.commands, verbose=args.verbose)
+                config(dev, conf=args.config, verbose=args.verbose)
         elif args.command == "config" and args.device and args.threading:
-            threader(args.command, args.device, verbose=args.verbose)
+            threader(args.command, args.device, conf=args.config, verbose=args.verbose)
 #        elif args.command == "config" and args.device and args.threading:
 #            threader(config, args.device)
 #        # config from file list
@@ -394,7 +408,7 @@ def main():
 #                    # remove accidental blank in the list, these blanks returns all records in database.
 #                    routers = list(filter(None, inputfile))
 #                    for router in routers:
-#                        config(router, commands)
+#                        config(router, config)
 #            except FileNotFoundError as e:
 #                print(f'There is an error FileNotFoundError: {e}')
 #            finally:
@@ -415,7 +429,7 @@ def main():
         elif args.command == "upload" or args.command == "download" and args.device is not None:
             # print(locals())
             # # print(globals())
-            if click.confirm(f'local file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
+            if confirm(f'local file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
                              default=False):
                 for dev in args.device:
                     x.scp_connect(dev, args.scpfile, args.path, args.command)
