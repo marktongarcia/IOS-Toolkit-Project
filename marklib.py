@@ -3,7 +3,10 @@ import time
 import getpass
 
 
-# passwd = getpass.getpass('Password: ')
+# pycharm is using a modified console which is incompatible with getpass module.
+# Use terminal instead to run script or use raw for testing.
+# password = getpass.getpass('Password: ')
+# password = getpass._raw_input('Password: ')
 
 
 def connect(server_ip):
@@ -20,7 +23,7 @@ def connect(server_ip):
     return ssh_client
 
 
-# connect to a list of dict.  sample if main.
+# connect to a list of dict.  used sample in local __main__.
 def xconnect(server_ip, server_port, user, passwd):
     ssh_client = paramiko.SSHClient()
     ssh_client.load_system_host_keys()
@@ -40,9 +43,20 @@ def get_shell(ssh_client):
 
 
 def send_command(shell, command, timeout=1):
-    print(f'Sending command: {command}')
+    # print(f'Sending command: {command}')
     shell.send(command + '\n')
     time.sleep(timeout)
+
+
+def send_from_file(shell, file_name, time=5):
+    print(f'Opening file {file_name}')
+    with open(file_name) as f:
+        commands = f.read().splitlines()
+        # remove accidental blank in the list.
+        commands = list(filter(None, commands))
+        print(f'sending commands to {shell}: {commands}')
+        for cmd in commands:
+            send_command(shell, cmd.lower())
 
 
 def show(shell, n=10000):

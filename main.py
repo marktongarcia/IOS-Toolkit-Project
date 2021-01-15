@@ -13,18 +13,19 @@ import click
 import requests, json
 import ssl
 
+"""
+
+"""
+
 __author__ = "Mark Garcia"
-__copyright__ = "Copyright 2020"
+__copyright__ = "Copyright 2020, The IOS/Shell Toolkit Project"
 __version__ = 1.01
 __maintainer__ = "Mark Garcia"
 __email__ = "garcia.markanthony@gmail.com"
 __status__ = "Development"
 
 
-# pycharm is using a modified console which is incompatible with getpass module.
-# Use terminal instead to run script or use raw for testing.
-# password = getpass.getpass('Password: ')
-# password = getpass._raw_input('Password: ')
+
 
 
 def tcpcheck(ip, port, timeout):
@@ -66,6 +67,13 @@ def listping(obj, hostname, file, switch, verbose):
 
 
 def backup(router):
+    '''
+    takes in an ip address or fqdn of a device "router".
+    taken argument could be a list and the loop is done in argparse
+    :param router: argument consist of a single ip or fqdn
+    :type router: str
+    :return:
+    '''
     try:
         # client = x.connect(**router)  # **kwargs for dict argument
         client = x.connect(router)  # **kwargs or **routers for dict argument
@@ -114,19 +122,34 @@ def backup(router):
     finally:
         pass
 
+def config(router, commands):
+    client = x.connect(router)
+    shell = x.get_shell(client)
 
-# api using cookie or token using Authentication
-def apix():
-    authdata = {'username': 'admin', 'password': 'admin'}
-    url = "http://192.168.1.13:8000/login/?next=/"
-    r = requests.post('http://192.168.1.13:8000/login/?next=/', data=json.dumps(authdata), verify=False, proxies=None)
-    print(r)
-    token = json.loads(r.text)['session']
-    print(token)
+    x.send_from_file(shell, commands)
 
+    # capture and decode output
+    output = x.show(shell)
 
-# api using pre-defined token access
-def apiy():
+    # processing the output
+    output_list = output.splitlines()
+    output_list = output_list[15:-1]
+    print(output_list)
+    output = '\n'.join(output_list)
+    print(output)
+
+    ## api using cookie or token using Authentication
+    #def apix():
+    #    authdata = {'username': 'admin', 'password': 'admin'}
+    #    url = "http://192.168.1.13:8000/login/?next=/"
+    #    r = requests.post('http://192.168.1.13:8000/login/?next=/', data=json.dumps(authdata), verify=False, proxies=None)
+    #    print(r)
+    #    token = json.loads(r.text)['session']
+    #    print(token)
+    #
+    #
+    ## api using pre-defined token access
+    #def apiy():
     # test info
     testip = "192.168.1.201"
     # api query
@@ -146,6 +169,20 @@ def apiy():
 
 
 def threader(function, routers):
+    '''
+    By default, the execution of a python script is sequentially with a single process and a single thread inside it.
+    Multithreading will execute the compatible tasks/functions like backup() concurrently.
+    There is a difference between concurrency and parallelism.
+    In fact the cpu does not execute the threads in parallel.
+
+    this takes in two arguments: first argument is the compatible function and
+    next is the routers which is a list of ip or fqdn. show docstring
+    :param function: arg1 name of compatible function to use threading
+    :type function: str
+    :param routers: arg2 list of ip or fqdn
+    :type routers: list
+    :return:
+    '''
     try:
         # creating an empty list (it will store the threads)
         threads = list()  # list (list() / []) can also store any objects including abstract objects like threads.
@@ -325,6 +362,42 @@ def main():
                 print(f'There is an error FileNotFoundError: {e}')
             finally:
                 pass
+        # config device
+        elif args.command == "config" and args.device and args.threading is False:
+            for dev in args.device:
+               # print(f'push list of commands in {args.commands} to {dev}')
+               # exit(1)
+                config(dev, args.commands)
+#        elif args.command == "config" and args.device and args.threading:
+#            threader(config, args.device)
+#        # config from file list
+#        elif args.command == "config" and args.file and args.threading is False:
+#            # print(args.file)
+#            # exit(1)
+#            # parse file using input as list of str.
+#            try:
+#                with open(args.file, 'r') as inputfile:
+#                    inputfile = inputfile.read().splitlines()
+#                    # remove accidental blank in the list, these blanks returns all records in database.
+#                    routers = list(filter(None, inputfile))
+#                    for router in routers:
+#                        config(router, commands)
+#            except FileNotFoundError as e:
+#                print(f'There is an error FileNotFoundError: {e}')
+#            finally:
+#                pass
+#        elif args.command == "config" and args.file and args.threading:
+#            # print(args.file)
+#            try:
+#                with open(args.file, 'r') as inputfile:
+#                    inputfile = inputfile.read().splitlines()
+#                    # remove accidental blank in the list, these blanks returns all records in database.
+#                    routers = list(filter(None, inputfile))
+#                    threader(config, routers)
+#            except FileNotFoundError as e:
+#                print(f'There is an error FileNotFoundError: {e}')
+#            finally:
+#                pass
         # scp upload/put and download/get
         elif args.command == "upload" or args.command == "download" and args.device is not None:
             # print(locals())
