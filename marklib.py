@@ -2,8 +2,11 @@ import paramiko
 import time
 
 
+
 def connect(server_ip):
     import getpass
+    import os
+    username = os.environ['USER']  # get current user in os environment variable.
     # pycharm is using a modified console which is incompatible with getpass module.
     # Use terminal instead to run script or use raw for testing.
     # password = getpass.getpass('Password: ')
