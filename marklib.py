@@ -1,15 +1,13 @@
 import paramiko
 import time
-import getpass
-
-
-# pycharm is using a modified console which is incompatible with getpass module.
-# Use terminal instead to run script or use raw for testing.
-# password = getpass.getpass('Password: ')
-# password = getpass._raw_input('Password: ')
 
 
 def connect(server_ip):
+    import getpass
+    # pycharm is using a modified console which is incompatible with getpass module.
+    # Use terminal instead to run script or use raw for testing.
+    # password = getpass.getpass('Password: ')
+    # password = getpass._raw_input('Password: ')
     ssh_client = paramiko.SSHClient()
     ssh_client.load_system_host_keys()
     ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())

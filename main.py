@@ -147,7 +147,7 @@ def config(router, conf=None, verbose=False):
 
         # processing the output
         output_list = output.splitlines()
-        output_list = output_list[15:-1]
+        output_list = output_list[15:-1]  # you might want to change this for non-ios device as it trims the first 15 lines.
         print(output_list)
         output = '\n'.join(output_list)
         print(output)
@@ -237,7 +237,7 @@ def main():
     parser = argparse.ArgumentParser(
         description='cisco ios toolkit',
         usage='iostoolkit.py [command] [-options]',
-        epilog='Example:\n"python3 iostoolkit.py backup -d 192.168.1.201 192.168.1.202 ./hostlist.txt -t"',
+        epilog='Example:\n"python3 iostoolkit.py backup -d 192.168.1.201 192.168.1.202 -t"',
         allow_abbrev=True,
         add_help=True)
 
