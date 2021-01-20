@@ -1,11 +1,14 @@
 import paramiko
 import time
+from scp import SCPClient
+import getpass
+import os
 
 
-
+# client = paramiko.SSHClient()
+# client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+# client.connect(hostname='192.168.1.201', username='cisco', password='cisco')
 def connect(server_ip):
-    import getpass
-    import os
     username = os.environ['USER']  # get current user in os environment variable.
     # pycharm is using a modified console which is incompatible with getpass module.
     # Use terminal instead to run script or use raw for testing.
@@ -13,7 +16,8 @@ def connect(server_ip):
     # password = getpass._raw_input('Password: ')
     ssh_client = paramiko.SSHClient()
     ssh_client.load_system_host_keys()
-    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+    ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # to avoid - paramiko.ssh_exception.SSHException:
+    # Server '192.168.1.201' not found in known_hosts
     print(f'\nConnecting to {server_ip}...')
     ssh_client.connect(hostname=server_ip, port=22, username='cisco', password='cisco',
                        look_for_keys=False, allow_agent=False)
@@ -36,18 +40,18 @@ def xconnect(server_ip, server_port, user, passwd):
     # if you want to use a local variable outside the function in which it is defined; you have to "return" it.
     return ssh_client
 
-
+# shellchannel = client.invoke_shell()
 def get_shell(ssh_client):
     shellchannel = ssh_client.invoke_shell()  # read about invoke_shell vs exec_command
     print('Successfully connected')
     return shellchannel
 
 
+# shellchannel.send('show verion\n')
 def send_command(shell, command, timeout=1):
     # print(f'Sending command: {command}')
     shell.send(command + '\n')
     time.sleep(timeout)
-
 
 def send_from_file(shell, file_name, verbose=False, timeout=5):
     if verbose:
@@ -63,12 +67,13 @@ def send_from_file(shell, file_name, verbose=False, timeout=5):
             send_command(shell, cmd.lower())
 
 
+# print(shellchannel.recv(10000).decode('utf-8'))
 def show(shell, n=10000):
     xoutput = shell.recv(n)  # reading shell output buffer in bytes.
     # decoding from bytes to string.  'utf-8' is the default value so you can leave the decode function empty as well.
     return xoutput.decode('utf-8')
 
-
+# shellchannel.close()
 def close(ssh_client):  # close the ssh session if active.
     if ssh_client.get_transport().is_active():
         print('Closing connection...\n')
@@ -77,7 +82,8 @@ def close(ssh_client):  # close the ssh session if active.
 
 # SCP upload or download
 def scp_connect(server_ip, file, path, command=None, timeout=1):
-    from scp import SCPClient
+    # username = os.environ['USER']
+    # password = getpass.getpass('Password: ')
 
     ssh_client = paramiko.SSHClient()
     ssh_client.load_system_host_keys()
