@@ -131,6 +131,13 @@ def backup(router, verbose=False):
         pass
 
 def config(router, conf=None, verbose=False):
+    '''
+
+    :param router:
+    :param conf:
+    :param verbose:
+    :return:
+    '''
     # print(verbose)
     # exit(1)
     client = x.connect(router)
@@ -255,8 +262,9 @@ def main():
                                           usage="iostoolkit.py upload [file] [remote path] [device list] [-options]",
                                           epilog='Example:\n'
                                                  '"python3 iostoolkit.py upload ./hostlist.txt ./" -d 192.168.1.12')
-    upload_parser.add_argument("scpfile", help="upload local file Default=ssh user home dir")
-    upload_parser.add_argument("path", action="store", help="remote path | Default=overwrite existing file")
+    upload_parser.add_argument(dest="scpfile", metavar="local file", help="upload local file Default=ssh user home dir")
+    upload_parser.add_argument(dest="path", metavar="remote file", action="store",
+                               help="save as filename | Default=overwrite existing file in user home directory")
     upload_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     # define mutually exclusive group for optional args. only one option from the group can be used.
     device = upload_parser.add_mutually_exclusive_group(required=True)
@@ -268,8 +276,9 @@ def main():
                                             usage="iostoolkit.py download [file] [local path] [device list] [-options]",
                                             epilog='Example:\n"python3 '
                                                    'iostoolkit.py download ./hostlist.txt ./ -d 192.168.1.12"')
-    download_parser.add_argument("scpfile", action="store", help="download remote file")
-    download_parser.add_argument("path", action="store", help="local path | Default=script dir and same filename")
+    download_parser.add_argument(dest="scpfile", metavar="remote file", action="store", help="download remote file")
+    download_parser.add_argument(dest="path", metavar="local file", action="store",
+                                 help="local file | Default=overwrite existing file in the dir you ran the script")
     download_parser.add_argument("-s", "--show", help="shows arguments and device list", action="store_true")
     device = download_parser.add_mutually_exclusive_group(required=True)
     device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
@@ -318,7 +327,8 @@ def main():
     device.add_argument("-d", "--device", nargs="+", metavar='', help="hostname or ip delimited by space")
     device.add_argument("-f", "--file", help="file with the list of hostnames", type=str)
 
-    # alternative, pass a single required arg based only on choices provided ans store as function.  print(args.function)
+    # alternative, pass a single required arg based only on choices provided ans store as function.
+    # print(args.function)
     # parser.add_argument(dest="scp", nargs="?", choices=["tea", "download"], help="select function to use")
 
     # tab autocomplete using argcomple package. ## TESTING, not yet working
