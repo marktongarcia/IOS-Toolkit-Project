@@ -8,8 +8,10 @@ import os, getpass
 def auth():
     # credentials pased to be used in paramiko class.
     # username = os.environ['USER']  # get current user in os environment variable.
+    # here we are defining an attribute for auth so we can use them insdie the Remote class.
     auth.username = getpass._raw_input('Username: ')
     auth.password = getpass.getpass('Password: ')
+    auth.tae = 'ikaw'
 
 
 
