@@ -2,6 +2,8 @@
 # PYTHON_ARGCOMPLETE_OK
 
 
+#!/usr/bin/env /opt/ios_toolkit/bin/python3  'for venv'
+
 # Automating multiple firewalls
 import mylibs as x  # mylibs.py should be in the same directory with this script (or in sys.path)
 import threading  # used in function threader.
