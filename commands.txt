@@ -1,9 +1,9 @@
-term len 0
+terminal length 0
+enable
 show version
 conf t
 int loopback 123
- ip address 123.0.0.1 255.255.255.255
-
- no shut
+ip address 123.0.0.1 255.255.255.255
+no shut
 
 
