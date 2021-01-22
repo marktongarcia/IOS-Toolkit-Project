@@ -1,17 +1,7 @@
 import paramiko
 import time
 from scp import SCPClient
-import os, getpass
 
-
-
-def auth():
-    # credentials pased to be used in paramiko class.
-    # username = os.environ['USER']  # get current user in os environment variable.
-    # here we are defining an attribute for auth so we can use them insdie the Remote class.
-    auth.username = getpass._raw_input('Username: ')
-    auth.password = getpass.getpass('Password: ')
-    auth.tae = 'ikaw'
 
 
 
@@ -20,8 +10,7 @@ class Remote(object):
     Container class for SSH functionality. Needs to be used in a with statement.
     basically a paramiko class for use in a "with" block that automatically opens and closes a session.
     """
-    auth()
-    def __init__(self, hostname, username=auth.username, password=auth.password, verbose=False):
+    def __init__(self, hostname, username=None, password=None, verbose=False):
         self.host = hostname
         self.user = username
         self.password = password

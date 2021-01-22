@@ -12,6 +12,7 @@ import sys
 import argcomplete
 from click import confirm
 import requests, json
+import os, getpass
 
 
 """
@@ -35,6 +36,15 @@ __status__ = "Development"
 
 
 
+def auth():
+    # credentials pased to be used in paramiko class.
+    # username = os.environ['USER']  # get current user in os environment variable.
+    # here we are defining an attribute for auth so we can use them insdie the Remote class.
+    # simply returning it does not make the variable available on other functions unless if you pass it as an argument.
+    # this makes it less code since we only define credentials when calling the class x.Remote.
+    auth.username = getpass._raw_input('Username: ')
+    auth.password = getpass.getpass('Password: ')
+    # return username, password
 
 def tcpcheck(ip, port, timeout):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -83,7 +93,7 @@ def backup(router, verbose=False):
     :return:
     '''
     try:
-        with x.Remote(router, verbose=verbose) as remote:
+        with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote:
             remote.shell('terminal length 0', timeout=1)
             remote.shell('enable', timeout=1)
             remote.shell('cisco', timeout=1)  # this is the enable password
@@ -135,7 +145,7 @@ def config(router, conf=None, verbose=False):
     # print(globals())
     # print(locals())
     # exit(1)
-    with x.Remote(router, verbose=verbose) as remote:
+    with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote:
         remote.send_from_file(conf)
 
         if remote.verbose:
@@ -339,11 +349,9 @@ def main():
         sys.exit(1)
     args = parser.parse_args()
 
-    # process arguments
-    #    try:
-    #        print(parser.parse_args())
-    #    except IOError as msg:
-    #        parser.error(str(msg))
+    # this is to get the credentials once.  we define it as a function attribute.
+    auth()
+
     try:
         # show args
         if args.show and args.command is None:
@@ -436,7 +444,7 @@ def main():
             if confirm(f'scp: {args.command}\nlocal file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
                              default=False):
                 for dev in args.device:
-                    with x.Remote(dev, verbose=args.verbose) as remote:
+                    with x.Remote(dev, username=auth.username, password=auth.password, verbose=args.verbose) as remote:
                         remote.scp_connect(args.scpfile, args.path, args.command)
         # scp to/from a list of devices from file
         elif args.command == "upload" or args.command == "download" and args.file is not None:
@@ -448,7 +456,7 @@ def main():
                         # remove accidental blank in the list, these blanks returns all records in database.
                         routers = list(filter(None, inputfile))
                         for router in routers:
-                            with x.Remote(router, verbose=args.verbose) as remote:
+                            with x.Remote(router, username=auth.username, password=auth.password, verbose=args.verbose) as remote:
                                 remote.scp_connect(args.scpfile, args.path, args.command)
                 except FileNotFoundError as e:
                     print(f'There is an error FileNotFoundError: {e}')
