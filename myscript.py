@@ -34,7 +34,7 @@ __status__ = "Development"
 
 
 # username = os.environ['USER']  # get current user in os environment variable.
-# username = getpass._raw_input('Password: ')
+# username = getpass._raw_input('Username: ')
 # password = getpass.getpass('Password: ')
 # username, password = 'cisco', 'cisco'
 username, password = 'gns3', 'gns3'
