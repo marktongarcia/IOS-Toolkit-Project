@@ -1,6 +1,12 @@
 import paramiko
 import time
 from scp import SCPClient
+import os, getpass
+
+# credentials pased to be used in paramiko class.
+# username = os.environ['USER']  # get current user in os environment variable.
+username = getpass._raw_input('Username: ')
+password = getpass.getpass('Password: ')
 
 
 class Remote(object):
@@ -9,7 +15,7 @@ class Remote(object):
     basically a paramiko class for use in a "with" block that automatically opens and closes a session.
     """
 
-    def __init__(self, hostname, username, password, verbose=False):
+    def __init__(self, hostname, username=username, password=password, verbose=False):
         self.host = hostname
         self.user = username
         self.password = password

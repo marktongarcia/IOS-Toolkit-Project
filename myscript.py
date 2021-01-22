@@ -10,8 +10,7 @@ import sys
 import argcomplete
 from click import confirm
 import requests, json
-import os
-import getpass
+
 
 """
 Permission to make digital or hard copies of all or part of this work for
@@ -33,12 +32,9 @@ __email__ = "garcia.markanthony@gmail.com"
 __status__ = "Development"
 
 
-# username = os.environ['USER']  # get current user in os environment variable.
-# username = getpass._raw_input('Username: ')
-# password = getpass.getpass('Password: ')
-# username, password = 'cisco', 'cisco'
-username, password = 'gns3', 'gns3'
 
+
+username, password = None, None
 
 def tcpcheck(ip, port, timeout):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -87,7 +83,7 @@ def backup(router, verbose=False):
     :return:
     '''
     try:
-        with x.Remote(router, username=username, password=password, verbose=verbose) as remotei:
+        with x.Remote(router, verbose=verbose) as remote:
             remote.shell('terminal length 0', timeout=1)
             remote.shell('enable', timeout=1)
             remote.shell('cisco', timeout=1)  # this is the enable password
@@ -139,7 +135,7 @@ def config(router, conf=None, verbose=False):
     # print(globals())
     # print(locals())
     # exit(1)
-    with x.Remote(router, username=username, password=password, verbose=verbose) as remote:
+    with x.Remote(router, verbose=verbose) as remote:
         remote.send_from_file(conf)
 
         if remote.verbose:
@@ -236,6 +232,8 @@ def main():
     # print(f'function is {function} and list arg is {routers}')
     # exit(1)
     # threader(function, *routers)
+
+
 
     # instantiate parser object
     parser = argparse.ArgumentParser(
@@ -360,6 +358,7 @@ def main():
                 routers = inputfile.read().splitlines()
                 for router in routers:
                     print(router)
+
         # backup device
         elif args.command == "backup" and args.device and args.threading is False:
             for dev in args.device:
@@ -437,7 +436,7 @@ def main():
             if confirm(f'scp: {args.command}\nlocal file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
                              default=False):
                 for dev in args.device:
-                    with x.Remote(dev, username=username, password=password, verbose=args.verbose) as remote:
+                    with x.Remote(dev, verbose=args.verbose) as remote:
                         remote.scp_connect(args.scpfile, args.path, args.command)
         # scp to/from a list of devices from file
         elif args.command == "upload" or args.command == "download" and args.file is not None:
@@ -449,7 +448,7 @@ def main():
                         # remove accidental blank in the list, these blanks returns all records in database.
                         routers = list(filter(None, inputfile))
                         for router in routers:
-                            with x.Remote(router, username=username, password=password, verbose=args.verbose) as remote:
+                            with x.Remote(router, verbose=args.verbose) as remote:
                                 remote.scp_connect(args.scpfile, args.path, args.command)
                 except FileNotFoundError as e:
                     print(f'There is an error FileNotFoundError: {e}')
