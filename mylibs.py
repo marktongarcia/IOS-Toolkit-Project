@@ -30,7 +30,8 @@ class Remote(object):
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())   # to avoid
         # paramiko.ssh_exception.SSHException: Server '192.168.1.201' not found in known_hosts
         print(f'\nConnecting to {self.host}...')
-        self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password)
+        self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password,
+                                allow_agent=False, look_for_keys=False)
         self.shellchannel = self.ssh_client.invoke_shell()  # this is opening a channel where you send and recv.
         print('Successfully connected')
         return self
