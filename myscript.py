@@ -34,8 +34,6 @@ __status__ = "Development"
 
 
 
-username, password = None, None
-
 def tcpcheck(ip, port, timeout):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(timeout)

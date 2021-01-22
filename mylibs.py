@@ -9,6 +9,7 @@ username = getpass._raw_input('Username: ')
 password = getpass.getpass('Password: ')
 
 
+
 class Remote(object):
     """
     Container class for SSH functionality. Needs to be used in a with statement.
