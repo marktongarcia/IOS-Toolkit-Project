@@ -49,7 +49,7 @@ def auth():
     # simply returning it does not make the variable available on other functions unless if you pass it as an argument.
     # this makes it less code since we only define credentials when calling the class x.Remote.
     auth.username = getpass._raw_input('Username: ')
-    # username = os.environ['USER']
+    # auth.username = os.environ['USER']
     auth.password = getpass.getpass('Password: ')
     # return username, password
 
