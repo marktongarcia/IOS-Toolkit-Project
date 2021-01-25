@@ -69,8 +69,16 @@ class Remote(object):
     #     print('Successfully connected')
     #     self.shell = shellchannel
     #     return self
-    def connect(self):
-        self.shellchannel = self.ssh_client.invoke_shell()  # this is opening a shell channel where you send and recv.
+    def openchannel(self):
+        '''
+        this will open an interactive shell channel where you send and recv.
+        only 1 channel can be opened per session.
+        this is only used when sending or receiving a command required by invoke_shell().
+        exec_command or scp.put/scp.get does not require this.
+        :return:
+        '''
+        # opening interactive shell channel.
+        self.shellchannel = self.ssh_client.invoke_shell()
         # check if requires sudo / enable by checking prompt
         if '>' in self.shellchannel.recv(100).decode("utf-8"):
             self.shellchannel.send('enable\n')
