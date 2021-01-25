@@ -33,6 +33,10 @@ class Remote(object):
         self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password,
                                 allow_agent=False, look_for_keys=False)
         self.shellchannel = self.ssh_client.invoke_shell()  # this is opening a channel where you send and recv.
+        # check if requires sudo / enable by checking prompt
+        if '>' in self.shellchannel.recv(100).decode("utf-8"):
+            self.shellchannel.send('enable\n')
+            self.shellchannel.send(self.password + '\n')
         print('Successfully connected')
         return self
 
@@ -52,12 +56,17 @@ class Remote(object):
         #     return None, None, None
 
         stdin, stdout, stderr = self.execute(command)
-        exit(1)
+        out = stdin.read().decode().strip()
+        error = stderr.read().decode().strip()
         if sudo:
             stdin.write(self.password + '\n')
             stdin.flush()
-
-        return stdin, stdout, stderr
+        if self.verbose:
+            logger.info(out)
+        if error:
+            raise Exception('There was an error pulling the runtime: {}'.format(error))
+        # return stdin, stdout, stderr
+        return out
 
     # def get_shell(self):
     #     # get shell
@@ -71,6 +80,7 @@ class Remote(object):
             print(f'sending command line {command}')
         # send command
         # print(command)
+        # self.shellchannel.send('\n')
         self.shellchannel.send(command + '\n')
         time.sleep(timeout)
         # print(shellchannel.recv(10000).decode('utf-8'))
