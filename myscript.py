@@ -5,11 +5,10 @@
 import mylibs as x  # mylibs.py should be in the same directory with this script (or in sys.path)
 import threading  # used in function threader.
 import argparse
-import sys
 import argcomplete
 from click import confirm
 import requests, json
-import os, getpass
+import os, sys, getpass
 
 
 """
@@ -48,8 +47,12 @@ def auth():
     # here we are defining an attribute for auth so we can use them insdie the Remote class.
     # simply returning it does not make the variable available on other functions unless if you pass it as an argument.
     # this makes it less code since we only define credentials when calling the class x.Remote.
-    auth.username = getpass._raw_input('Username: ')
-    # auth.username = os.environ['USER']
+    if sys.platform == 'linux' or sys.platform == 'linux2':
+        auth.username = os.environ['USER']
+    elif sys.platform == 'win32':
+        auth.username = getpass._raw_input('Username: ')
+    else:
+        Print(f'Unknown operating system {sys.platform}')
     auth.password = getpass.getpass('Password: ')
     # return username, password
 
