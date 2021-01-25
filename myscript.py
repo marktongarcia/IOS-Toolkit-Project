@@ -36,15 +36,15 @@ __status__ = "Development"
 
 
 
-def _auth():
+def auth():
     # credentials pased to be used in paramiko class.
     # username = os.environ['USER']  # get current user in os environment variable.
     # here we are defining an attribute for auth so we can use them insdie the Remote class.
     # simply returning it does not make the variable available on other functions unless if you pass it as an argument.
     # this makes it less code since we only define credentials when calling the class x.Remote.
-    _auth.username = getpass._raw_input('Username: ')
+    auth.username = getpass._raw_input('Username: ')
     # username = os.environ['USER']
-    _auth.password = getpass.getpass('Password: ')
+    auth.password = getpass.getpass('Password: ')
     # return username, password
 
 def tcpcheck(ip, port, timeout):
@@ -351,7 +351,7 @@ def main():
     args = parser.parse_args()
 
     # this is to get the credentials once.  we define it as a function attribute.
-    _auth()
+    auth()
 
     try:
         # show args
