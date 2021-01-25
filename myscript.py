@@ -1,9 +1,6 @@
 #!/usr/bin/env python3
 # PYTHON_ARGCOMPLETE_OK
 
-
-#!/usr/bin/env /opt/ios_toolkit/bin/python3  'for venv'
-
 # Automating multiple firewalls
 import mylibs as x  # mylibs.py should be in the same directory with this script (or in sys.path)
 import threading  # used in function threader.
@@ -16,6 +13,15 @@ import os, getpass
 
 
 """
+Installation:
+
+# venv - replace first line to:
+#!/usr/bin/env /opt/ios_toolkit/bin/python3
+
+# create a symlink inside /usr/local/bin 
+touch /usr/local/bin ios_toolkit
+ln -s /op/ios_toolkit/ios_toolkit.py  ios_toolkit
+
 Permission to make digital or hard copies of all or part of this work for
 personal or classroom use is granted without fee provided that copies are
 not made or distributed for profit or commercial advantage and that copies
@@ -94,14 +100,14 @@ def backup(router, verbose=False):
     :return:
     '''
     try:
-        with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote:
-            remote.shell('terminal length 0', timeout=1)
-            remote.shell('enable', timeout=1)
-            remote.shell('cisco', timeout=1)  # this is the enable password
-            remote.shell('show run')
+        with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote_:
+            remote_.shell('terminal length 0', timeout=1)
+            remote_.shell('enable', timeout=1)
+            remote_.shell('cisco', timeout=1)  # this is the enable password
+            remote_.shell('show run')
 
-            output = remote.show()
-            if remote.verbose:
+            output = remote_.show()
+            if remote_.verbose:
                 print(output)
 
             # processing the output
@@ -118,7 +124,7 @@ def backup(router, verbose=False):
             # if passed argument is dict
             # file_name = f'{router["server_ip"]}_{year}-{month}-{day}.txt'
             file_name = f'{router}_{year}-{month}-{day}.txt'
-            if remote.verbose:
+            if remote_.verbose:
                 print(f' saving file as {file_name}...')
 
             # writing the backup to the file with dated filename
@@ -146,13 +152,13 @@ def config(router, conf=None, verbose=False):
     # print(globals())
     # print(locals())
     # exit(1)
-    with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote:
-        remote.send_from_file(conf)
+    with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote_:
+        remote_.send_from_file(conf)
 
-        if remote.verbose:
+        if remote_.verbose:
             # capture and decode output
-            output = remote.show()
-            if remote.verbose:
+            output = remote_.show()
+            if remote_.verbose:
                 print(output)
 
             # processing the output
@@ -445,8 +451,8 @@ def main():
             if confirm(f'scp: {args.command}\nlocal file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
                              default=False):
                 for dev in args.device:
-                    with x.Remote(dev, username=auth.username, password=auth.password, verbose=args.verbose) as remote:
-                        remote.scp_connect(args.scpfile, args.path, args.command)
+                    with x.Remote(dev, username=auth.username, password=auth.password, verbose=args.verbose) as remote_:
+                        remote_.scp_connect(args.scpfile, args.path, args.command)
         # scp to/from a list of devices from file
         elif args.command == "upload" or args.command == "download" and args.file is not None:
             if confirm(f'local file: {args.scpfile}\nremote path: {args.path}\n\n Do you want to proceed?',
@@ -457,8 +463,8 @@ def main():
                         # remove accidental blank in the list, these blanks returns all records in database.
                         routers = list(filter(None, inputfile))
                         for router in routers:
-                            with x.Remote(router, username=auth.username, password=auth.password, verbose=args.verbose) as remote:
-                                remote.scp_connect(args.scpfile, args.path, args.command)
+                            with x.Remote(router, username=auth.username, password=auth.password, verbose=args.verbose) as remote_:
+                                remote_.scp_connect(args.scpfile, args.path, args.command)
                 except FileNotFoundError as e:
                     print(f'There is an error FileNotFoundError: {e}')
                 except TimeoutError as e:
