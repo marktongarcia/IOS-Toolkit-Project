@@ -32,11 +32,6 @@ class Remote(object):
         print(f'\nConnecting to {self.host}...')
         self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password,
                                 allow_agent=False, look_for_keys=False)
-        self.shellchannel = self.ssh_client.invoke_shell()  # this is opening a shell channel where you send and recv.
-        # check if requires sudo / enable by checking prompt
-        if '>' in self.shellchannel.recv(100).decode("utf-8"):
-            self.shellchannel.send('enable\n')
-            self.shellchannel.send(self.password + '\n')
         print('Successfully connected')
         return self
 
@@ -74,6 +69,14 @@ class Remote(object):
     #     print('Successfully connected')
     #     self.shell = shellchannel
     #     return self
+    def connect(self):
+        self.shellchannel = self.ssh_client.invoke_shell()  # this is opening a shell channel where you send and recv.
+        # check if requires sudo / enable by checking prompt
+        if '>' in self.shellchannel.recv(100).decode("utf-8"):
+            self.shellchannel.send('enable\n')
+            self.shellchannel.send(self.password + '\n')
+        return self
+
 
     def shell(self, command, timeout=1):
         if self.verbose:

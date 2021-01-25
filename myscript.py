@@ -101,6 +101,7 @@ def backup(router, verbose=False):
     '''
     try:
         with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote_:
+            remote_.connect()
             remote_.shell('terminal length 0', timeout=1)
             remote_.shell('enable', timeout=1)
             remote_.shell('cisco', timeout=1)  # this is the enable password
@@ -153,6 +154,7 @@ def config(router, conf=None, verbose=False):
     # print(locals())
     # exit(1)
     with x.Remote(router, username=auth.username, password=auth.password, verbose=verbose) as remote_:
+        remote_.connect()
         remote_.send_from_file(conf)
 
         if remote_.verbose:
