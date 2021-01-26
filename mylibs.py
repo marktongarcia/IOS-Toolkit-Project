@@ -3,13 +3,12 @@ import time
 from scp import SCPClient
 
 
-
-
 class Remote(object):
     """
     Container class for SSH functionality. Needs to be used in a with statement.
     basically a paramiko class for use in a "with" block that automatically opens and closes a session.
     """
+
     def __init__(self, hostname, username=None, password=None, verbose=False):
         self.host = hostname
         self.user = username
@@ -27,7 +26,7 @@ class Remote(object):
         # else:
         self.ssh_client = paramiko.SSHClient()
         self.ssh_client.load_system_host_keys()
-        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())   # to avoid
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # to avoid
         # paramiko.ssh_exception.SSHException: Server '192.168.1.201' not found in known_hosts
         print(f'\nConnecting to {self.host}...')
         self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password,
@@ -84,7 +83,6 @@ class Remote(object):
             self.shellchannel.send('enable\n')
             self.shellchannel.send(self.password + '\n')
         return self
-
 
     def shell(self, command, timeout=1):
         if self.verbose:
