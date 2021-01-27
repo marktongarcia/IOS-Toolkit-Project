@@ -53,7 +53,6 @@ def auth():
         # private key if you have your public key installed in remote device "authorized_keys"
         auth.pkey = (os.getenv('HOME') + '.ssh/id_rsa')
     elif sys.platform == 'win32':
-        print('Windows machine')
         auth.username = getpass.win_getpass('Username: ')
         auth.password = getpass.win_getpass('Password:', stream=None)
         # auth.pkey = getpass._raw_input('public key: ')
