@@ -49,13 +49,19 @@ def auth():
     # this makes it less code since we only define credentials when calling the class x.Remote.
     if sys.platform == 'linux' or sys.platform == 'linux2':
         auth.username = os.environ['USER']
-        auth.pkey = paramiko.RSAKey.from_private_key_file(os.getenv('HOME'))
+        auth.password = getpass.getpass('Password: ')
+        # private key if you have your public key installed in remote device "authorized_keys"
+        auth.pkey = (paramiko.RSAKey.from_private_key_file(os.getenv('HOME')) + '.ssh/id_rsa')
+        print(auth.pkey)
+        exit(1)
     elif sys.platform == 'win32':
-        auth.username = getpass._raw_input('Username: ')
-        auth.pkey =
+        print('Windows machine')
+        auth.username = getpass.win_getpass('Username: ')
+        auth.password = getpass.win_getpass('Password:', stream=None)
+        auth.pkey = getpass._raw_input('public key: ')
+        print(auth.pkey)
     else:
         Print(f'Unknown operating system {sys.platform}')
-    auth.password = getpass.getpass('Password: ')
     # return username, password
 
 def tcpcheck(ip, port, timeout):
