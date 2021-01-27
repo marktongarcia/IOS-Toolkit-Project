@@ -52,8 +52,6 @@ def auth():
         auth.password = getpass.getpass('Password: ')
         # private key if you have your public key installed in remote device "authorized_keys"
         auth.pkey = (paramiko.RSAKey.from_private_key_file(os.getenv('HOME')) + '.ssh/id_rsa')
-        print(auth.pkey)
-        exit(1)
     elif sys.platform == 'win32':
         print('Windows machine')
         auth.username = getpass.win_getpass('Username: ')
