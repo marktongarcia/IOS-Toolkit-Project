@@ -9,11 +9,12 @@ class Remote(object):
     basically a paramiko class for use in a "with" block that automatically opens and closes a session.
     """
 
-    def __init__(self, hostname, username=None, password=None, verbose=False):
+    def __init__(self, hostname, username=None, password=None, pkey=None, verbose=False):
         self.host = hostname
         self.user = username
         self.password = password
         self.verbose = verbose
+        self.pkey = pkey
         # if 'paramiko' in sys.modules.key():
         #     self._has_paramiko = True
         # else:
@@ -29,7 +30,7 @@ class Remote(object):
         self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # to avoid
         # paramiko.ssh_exception.SSHException: Server '192.168.1.201' not found in known_hosts
         print(f'\nConnecting to {self.host}...')
-        self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password,
+        self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password, pkey=self.pkey,
                                 allow_agent=False, look_for_keys=False)
         print('Successfully connected')
         return self
@@ -106,7 +107,7 @@ class Remote(object):
             commands = list(filter(None, commands))
             print('Configuring device...')
             if self.verbose:
-                print(f'sending commands to {self.user}: {commands}')
+                print(f'sending commands to {self.host}: {commands}')
             for cmd in commands:
                 # print(cmd)
                 self.shell(cmd)

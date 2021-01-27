@@ -49,8 +49,10 @@ def auth():
     # this makes it less code since we only define credentials when calling the class x.Remote.
     if sys.platform == 'linux' or sys.platform == 'linux2':
         auth.username = os.environ['USER']
+        auth.pkey = paramiko.RSAKey.from_private_key_file(os.getenv('HOME'))
     elif sys.platform == 'win32':
         auth.username = getpass._raw_input('Username: ')
+        auth.pkey =
     else:
         Print(f'Unknown operating system {sys.platform}')
     auth.password = getpass.getpass('Password: ')
