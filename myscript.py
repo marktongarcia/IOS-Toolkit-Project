@@ -27,8 +27,8 @@ not made or distributed for profit or commercial advantage and that copies
 bear this notice and the full citation on the first page. To copy otherwise, to
 republish, to post on servers or to redistribute to lists, requires prior specific
 permission and/or a fee.
-IMC’11, November 2–4, 2011, Berlin, Germany.
-Copyright 2011 ACM 978-1-4503-1013-0/11/11 ...$10.00.
+Backnang, Germany.
+Copyright 2020.
 """
 
 __author__ = "Mark Garcia"
@@ -51,53 +51,52 @@ def auth():
         auth.username = os.environ['USER']
         auth.password = getpass.getpass('Password: ')
         # private key if you have your public key installed in remote device "authorized_keys"
-        auth.pkey = (paramiko.RSAKey.from_private_key_file(os.getenv('HOME')) + '.ssh/id_rsa')
+        auth.pkey = (os.getenv('HOME') + '.ssh/id_rsa')
     elif sys.platform == 'win32':
         print('Windows machine')
         auth.username = getpass.win_getpass('Username: ')
         auth.password = getpass.win_getpass('Password:', stream=None)
-        auth.pkey = getpass._raw_input('public key: ')
-        print(auth.pkey)
+        # auth.pkey = getpass._raw_input('public key: ')
     else:
         Print(f'Unknown operating system {sys.platform}')
     # return username, password
 
-def tcpcheck(ip, port, timeout):
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(timeout)
-    try:
-        s.connect((ip, int(port)))
-        s.shutdown(socket.SHUT_RDWR)
-        return True
-    except:
-        return False
-    finally:
-        s.close()
-
-
-def listping(obj, hostname, file, switch, verbose):
-    hostnames = list()
-    if hostname is None and file is None:
-        print('No hostname provided, use the -f option')
-        exit(1)
-    elif hostname is None and file is not None:
-        try:
-            with open(file, 'r') as inputfile:
-                hostnames = inputfile.read().splitlines()
-        except FileNotFoundError:
-            print("Unable to open file:", file)
-            exit(1)
-    else:
-        hostnames.append(hostname)
-    red = fg(1)
-    green = fg(2)
-    res = attr('reset')
-    for site in hostnames:
-        print(
-            (green + site + ' is reachable' + res) if tcpcheck(site, 22, 3) else (red + site + ' is unreachable' + res))
-        if switch:
-            print(((green + site + '-SW is reachable' + res) if tcpcheck(site + '-SW', 22, 3) else (
-                    red + site + '-SW is unreachable' + res)))
+# def tcpcheck(ip, port, timeout):
+#     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+#     s.settimeout(timeout)
+#     try:
+#         s.connect((ip, int(port)))
+#         s.shutdown(socket.SHUT_RDWR)
+#         return True
+#     except:
+#         return False
+#     finally:
+#         s.close()
+#
+#
+# def listping(obj, hostname, file, switch, verbose):
+#     hostnames = list()
+#     if hostname is None and file is None:
+#         print('No hostname provided, use the -f option')
+#         exit(1)
+#     elif hostname is None and file is not None:
+#         try:
+#             with open(file, 'r') as inputfile:
+#                 hostnames = inputfile.read().splitlines()
+#         except FileNotFoundError:
+#             print("Unable to open file:", file)
+#             exit(1)
+#     else:
+#         hostnames.append(hostname)
+#     red = fg(1)
+#     green = fg(2)
+#     res = attr('reset')
+#     for site in hostnames:
+#         print(
+#             (green + site + ' is reachable' + res) if tcpcheck(site, 22, 3) else (red + site + ' is unreachable' + res))
+#         if switch:
+#             print(((green + site + '-SW is reachable' + res) if tcpcheck(site + '-SW', 22, 3) else (
+#                     red + site + '-SW is unreachable' + res)))
 
 
 def backup(router, verbose=False):
