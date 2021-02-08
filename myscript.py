@@ -14,6 +14,16 @@ import os, sys, getpass
 """
 Installation:
 
+# create venv if necessary
+python3 -m venv /path/to/new/virtual/environment/foo
+#activate venv
+source foo/bin/activate
+#verify
+which pip3, which python3
+
+# install requirements.txt
+pip3 install -r requirements.txt
+
 # venv - replace first line to:
 #!/usr/bin/env /opt/ios_toolkit/bin/python3
 
