@@ -33,7 +33,7 @@ class Remote(object):
         print(f'\nConnecting to {self.host}...')
         self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password, pkey=self.pkey,
                                 allow_agent=False, look_for_keys=False)
-        print(f'Successfully connected {self.host}')
+        print(f'Successfully connected to {self.host}')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -107,7 +107,7 @@ class Remote(object):
             commands = f.read().splitlines()
             # remove accidental blank in the list.
             commands = list(filter(None, commands))
-            print(f'Configuring device {self.host}...')
+            print(f'Configuring {self.host}...')
             if self.verbose:
                 print(f'sending commands to {self.host}: {commands}')
             for cmd in commands:
