@@ -33,13 +33,13 @@ class Remote(object):
         print(f'\nConnecting to {self.host}...')
         self.ssh_client.connect(hostname=self.host, username=self.user, password=self.password, pkey=self.pkey,
                                 allow_agent=False, look_for_keys=False)
-        print('Successfully connected')
+        print(f'Successfully connected {self.host}')
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
         try:
             if self.ssh_client is not None:
-                print('Closing connection...\n')
+                print(f'Closing connection to {self.host}...\n')
                 self.ssh_client.close()
         except:
             print("received an exception closing the ssh connection.")
@@ -58,7 +58,8 @@ class Remote(object):
             stdin.write(self.password + '\n')
             stdin.flush()
         if self.verbose:
-            logger.info(out)
+            print('Verbosity on')
+            # logger.info(out)
         if error:
             raise Exception('There was an error pulling the runtime: {}'.format(error))
         # return stdin, stdout, stderr
@@ -106,7 +107,7 @@ class Remote(object):
             commands = f.read().splitlines()
             # remove accidental blank in the list.
             commands = list(filter(None, commands))
-            print('Configuring device...')
+            print(f'Configuring device {self.host}...')
             if self.verbose:
                 print(f'sending commands to {self.host}: {commands}')
             for cmd in commands:

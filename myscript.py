@@ -42,6 +42,10 @@ __status__ = "Development"
 
 
 def auth():
+    """
+    this is the main authentication variables used by paramiko in mylibs.py
+    :returnh
+    """
     # credentials pased to be used in paramiko class.
     # username = os.environ['USER']  # get current user in os environment variable.
     # here we are defining an attribute for auth so we can use them insdie the Remote class.
