@@ -1,0 +1,4 @@
+{% for person in persons -%}
+My name is {{ person.name }} and my age is {{ person.age }} and my ip address is {{ person.ip }}
+    {{ person.name }} {{ person.age }}
+{% endfor %}

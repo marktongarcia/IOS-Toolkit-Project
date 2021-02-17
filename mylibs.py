@@ -15,12 +15,6 @@ class Remote(object):
         self.password = password
         self.verbose = verbose
         self.pkey = pkey
-        # pkey = paramiko.RSAKey.from_private_key_file(pkey)
-        # if 'paramiko' in sys.modules.key():
-        #     self._has_paramiko = True
-        # else:
-        #     print('Please import paramiko module')
-        #     self._has_paramiko = False
 
     def __enter__(self):
         # if not self._has_paramiko():
