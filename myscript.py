@@ -29,8 +29,11 @@ pip3 install -r requirements.txt
 #!/usr/bin/env /opt/ios_toolkit/bin/python3
 
 # create a symlink inside /usr/local/bin 
-touch /usr/local/bin ios_toolkit
 ln -s /opt/ios_toolkit/ios_toolkit.py  ios_toolkit
+
+# enable argcomplete for this script only
+sudo apt install register-python-argcomplete3
+eval "$(register-python-argcomplete3 ios_toolkit)"
 
 Permission to make digital or hard copies of all or part of this work for
 personal or classroom use is granted without fee provided that copies are
